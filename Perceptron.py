@@ -6,6 +6,7 @@ class Perceptron:
         self.w = pesosSinapticos
         self.n = taxaAprendizagem
         self.w0 = limiar
+        self.w0 = [0]
         self.u = []
 
     def treinamento(self): #funcao que ira realizar o treinamento
