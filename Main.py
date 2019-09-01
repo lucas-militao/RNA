@@ -2,11 +2,11 @@ from Perceptron import Perceptron
 from Dataset import Dataset
 
 #valores do exercício para teste
-entradas = [[0.5, 1.5], [-0.5, 0.5], [0.5, 0.5], [0.5, -0.3], [1.5, 0.5]]
-saidasDesejadas = [1, -1, 1, -1, 1]
-pesosSinapticos = [[1, 2]]
-taxaAprendizagem = 0.1
-limiar = [-2]
+# entradas = [[0.5, 1.5], [-0.5, 0.5], [0.5, 0.5], [0.5, -0.3], [1.5, 0.5]]
+# saidasDesejadas = [1, -1, 1, -1, 1]
+# pesosSinapticos = [[1, 2]]
+# taxaAprendizagem = 0.1
+# limiar = [-2]
 
 #útil
 # with open('./dtest.txt') as f:
@@ -19,8 +19,12 @@ def main():
 
     dataset = Dataset(arquivoD, arquivoX)
 
+    teste = Perceptron(dataset.definindoEntradas(), dataset.definindoValoresDesejados(), 1)
+
+    teste.treinamento()
+
     # print(dataset.definindoValoresDesejados())
-    print(dataset.definindoEntradas())
+    # print(dataset.definindoEntradas())
 
     arquivoD.close()
 
@@ -29,7 +33,7 @@ def main():
     #
     # teste.treinamento()
     #
-    # print(teste.w)
+    print(teste.w)
 
 
 main()
