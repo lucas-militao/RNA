@@ -8,10 +8,6 @@ from Dataset import Dataset
 # taxaAprendizagem = 0.1
 # limiar = [-2]
 
-#útil
-# with open('./dtest.txt') as f:
-#     conteudo = f.readlines()
-
 def main():
 
     arquivoD = open("./dtest.txt", "r")
@@ -23,18 +19,10 @@ def main():
 
     teste.treinamento()
 
-    # print(dataset.definindoValoresDesejados())
-    # print(dataset.definindoEntradas())
-
     arquivoD.close()
 
-    #teste com os valores do exercício
-    # teste = Perceptron(entradas, saidasDesejadas, pesosSinapticos, taxaAprendizagem, limiar)
-    #
-    # teste.treinamento()
-    #
-    print(teste.w)
-
+    for i in teste.u:
+        print(i)
 
 main()
 
