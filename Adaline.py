@@ -1,54 +1,60 @@
 import random
+import pandas as pd
 import statistics
-
 from sklearn import preprocessing
 
-class Perceptron:
+class Adaline:
 
-    def __init__(self, entradas, saidasDesejadas, taxaAprendizagem):
-        # entradas = preprocessing.normalize(entradas) #normalizar entradas
-
-        # df[entradas] = (df[entradas] - df[entradas].mean()) / df[entradas].std(ddof=0)
-
-        entradas = self.normalization(entradas)
+    def __init__(self, entradas, saidasDesejadas, taxaAprendizagem, precisao_requerida):
+        # entradas = preprocessing.normalize(entradas) #dados normalizados
 
         self.x = entradas
         self.d = saidasDesejadas
         self.w = []
         self.n = taxaAprendizagem
         self.w0 = []
-        self.u = []
         self.epoca = 0
+        self.Eqm = []
+        self.Eqm_anterior = 0
+        self.Eqm_atual = 0
+        self.precisao = precisao_requerida
 
         # treinamento
-    def treinamento(self):  # funcao que ira realizar o treinamento
-        varW = self.inicializarPesos(len(self.x[0]))
-        varW0 = self.inicializarLimiar()
-        varU = 0
+    def treinamento_online(self):  # funcao que ira realizar o treinamento
+        # self.varW = self.inicializarPesos(len(self.x[0]))
+        # self.varW0 = self.inicializarLimiar()
+        self.w.append(self.inicializarPesos(len(self.x[0])))
+        self.w0 = self.inicializarLimiar()
+        self.varU = 0
+        self.u = []
+        self.atualizacao = 0
         y = 0  # variável que irá receber o sinal(u)
 
-        erro = True
-        while erro:
-
-            erro = False
+        while self.Eqm_atual - self.Eqm_anterior <= self.precisao:
+            self.Eqm_anterior = self.calcEqm()
+            self.Eqm.append(self.Eqm_anterior)
 
             for i in range(len(self.x)):
-                varU = self.calculoSaida(self.x[i], varW, varW0)
+                self.varU = self.calculoSaida(self.x[i], self.w[self.atualizacao])
+                self.u.append(self.varU)
+                self.w.append(self.atualizarPesos(self.w[self.atualizacao], self.n, (self.d[i] - self.varU), self.x[i]))
+                self.w0.append(self.atualizarLimiar(self.w0[self.atualizacao], self.n, (self.d[i] - self.varU)))
 
-                y = 1 if varU >= 0 else -1
-
-                if (y != self.d[i]):
-                    varW = self.atualizarPesos(varW, self.n, (self.d[i] - y), self.x[i])
-                    varW0 = self.atualizarLimiar(varW0, self.n, (self.d[i] - y))
-                    self.w.append(varW)
-                    self.w0.append(varW0)
-                    erro = True
-                else:
-                    self.u.append(varU)
-                    self.w.append(varW)
-                    self.w0.append(varW0)
+            self.Eqm_atual = self.calcEqm(len(self.x))
+            self.Eqm.append(self.Eqm_atual)
             self.epoca += 1
     # ----------------------------------------------------------------------
+
+    # cálculo do Eqm
+    def calcEqm(self, p, u):
+
+        self.varU = 0
+        self.resultado = 0
+
+        for i in range(p):
+            self.resultado += u[i]
+
+        return self.resultado
 
     # cálculo da saída (u)
     def calculoSaida(self, x, w, w0):
@@ -100,18 +106,16 @@ class Perceptron:
 
     def normalization(self, x):
 
-        self.resultado = []
-
         for i in range(len(x)):
-            self.resultado.append([])
             for j in x[i]:
-                self.resultado[i].append((j - statistics.mean(x[i])) / statistics.pstdev(x[i]))
+                x[i][j] = (j - statistics.mean(x[i]))/statistics.pstdev(x[i])
 
-        return self.resultado
+        return x
+
 
     def predict(self, entradas, valoresDesejado, w1, w2):
-        normalizar = preprocessing.MinMaxScaler(feature_range=(-1, 1)).fit(entradas)
-        entradas = normalizar.transform(entradas)
+        # normalizar = preprocessing.MinMaxScaler(feature_range=(-1, 1)).fit(entradas)
+        # entradas = normalizar.transform(entradas)
         w0 = self.w0[len(self.w0)-1]
 
         for i in range(len(entradas)):
