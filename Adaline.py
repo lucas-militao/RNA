@@ -15,7 +15,7 @@ class Adaline:
         self.w0 = []
         self.epoca = 0
         self.Eqm = []
-        self.Eqm_anterior = 100
+        self.Eqm_anterior = 10000
         self.Eqm_atual = 0
         self.precisao = precisao_requerida
 
@@ -23,24 +23,31 @@ class Adaline:
     def treinamento_online(self):  # funcao que ira realizar o treinamento
         # self.varW = self.inicializarPesos(len(self.x[0]))
         # self.varW0 = self.inicializarLimiar()
-        self.w.append(self.inicializarPesos(len(self.x[0])))
-        self.w0.append(self.inicializarLimiar())
-        # self.w = [[0,0]]
-        # self.w0 = [0]
+        # self.w.append(self.inicializarPesos(len(self.x[0])))
+        # self.w0.append(self.inicializarLimiar())
+        self.w = [[0,0]]
+        self.w0 = [0]
         self.varU = 0
         self.u = []
         self.atualizacao = 0
         y = 0  # variável que irá receber o sinal(u)
 
         while abs(self.Eqm_atual - self.Eqm_anterior) >= self.precisao:
+            self.Eqm.append(self.Eqm_anterior)
             self.Eqm_anterior = self.Eqm_atual
-            # self.Eqm.append(self.Eqm_anterior)
+
+            self.u = []
 
             for i in range(len(self.x)):
-                self.varU = self.calculoSaida(self.x[i], self.w[i], self.w0[i])
+                self.varU = self.calculoSaida(self.x[i], self.w[self.atualizacao], self.w0[self.atualizacao])
                 self.u.append(self.varU)
-                self.w.append(self.atualizarPesos(self.w[i], self.n, (self.d[i] - self.varU), self.x[i]))
-                self.w0.append(self.atualizarLimiar(self.w0[i], self.n, (self.d[i] - self.varU)))
+                self.w.append(self.atualizarPesos(self.w[self.atualizacao], self.n, (self.d[i] - self.varU), self.x[i]))
+                self.w0.append(self.atualizarLimiar(self.w0[self.atualizacao], self.n, (self.d[i] - self.varU)))
+                self.atualizacao += 1
+
+                # self.w.append(self.atualizarPesos(self.w[i], self.n, (self.d[i] - self.varU), self.x[i]))
+                # self.w0.append(self.atualizarLimiar(self.w0[i], self.n, (self.d[i] - self.varU)))
+
 
             self.Eqm_atual = self.calcEqm(len(self.x), self.u, self.d)
             self.Eqm.append(self.Eqm_atual)
