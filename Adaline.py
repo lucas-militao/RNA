@@ -23,10 +23,10 @@ class Adaline:
     def treinamento_online(self):  # funcao que ira realizar o treinamento
         # self.varW = self.inicializarPesos(len(self.x[0]))
         # self.varW0 = self.inicializarLimiar()
-        # self.w.append(self.inicializarPesos(len(self.x[0])))
-        # self.w0.append(self.inicializarLimiar())
-        self.w = [[0,0]]
-        self.w0 = [0]
+        self.w.append(self.inicializarPesos(len(self.x[0])))
+        self.w0.append(self.inicializarLimiar())
+        # self.w = [[0,0]]
+        # self.w0 = [0]
         self.varU = 0
         self.u = []
         self.atualizacao = 0
@@ -37,7 +37,7 @@ class Adaline:
             # self.Eqm.append(self.Eqm_anterior)
 
             for i in range(len(self.x)):
-                self.varU = self.calculoSaida(self.x[i], self.w[self.atualizacao], self.w0[self.atualizacao])
+                self.varU = self.calculoSaida(self.x[i], self.w[i], self.w0[i])
                 self.u.append(self.varU)
                 self.w.append(self.atualizarPesos(self.w[i], self.n, (self.d[i] - self.varU), self.x[i]))
                 self.w0.append(self.atualizarLimiar(self.w0[i], self.n, (self.d[i] - self.varU)))
@@ -50,13 +50,13 @@ class Adaline:
     # cálculo do Eqm
     def calcEqm(self, p, u, d):
 
-        self.resultado = 0
+        resultado = 0
 
         for i in range(p):
-            self.resultado += pow(d[i] - u[i], 2)
-        self.resultado = self.resultado/p
+            resultado += pow(d[i] - u[i], 2)
+        resultado = resultado/p
 
-        return self.resultado
+        return resultado
 
     # cálculo da saída (u)
     def calculoSaida(self, x, w, w0):
@@ -150,3 +150,25 @@ class Adaline:
             print('-------------------------------------------------------------------------------------------------------')
 
         print('Eqm ======= {0}'.format(self.Eqm))
+
+    def conferirRespostas(self, x, w, w0, d, p): #imprime a porcentagem de acertos
+
+         varU = []
+         varY = []
+         resultado = 0
+         acertos = 0
+
+         for i in range(p):
+             for j in range(len(w[i])):
+                 resultado += w[i][j]*x[i][j]
+             resultado -= w0[i]
+             varU.append(resultado)
+             varY.append(1 if resultado >= 0 else -1)
+             print('valor resultante: {0}\tvalor desejado: {1}'.format(varY[i], d[i]))
+
+         for k in range(p):
+             if(varY[k] == d[k]):
+                 acertos += 1
+
+         print('{0}% de acertos'.format((acertos*100)/p))
+

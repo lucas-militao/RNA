@@ -24,11 +24,13 @@ def mainAdaline():
 
     redeAdalineTrain = Adaline(datasetTrain.definindoEntradas(), datasetTrain.definindoValoresDesejados(), taxa_aprendizado, precisao)
 
-    redeAdalineAnd = Adaline([[1,1], [0,0], [1,0], [0,1]], [1,0,0,0], 0.0025, 0.0001)
+    # redeAdalineAnd = Adaline([[1,1], [0,0], [1,0], [0,1]], [1,0,0,0], 0.0025, 0.0001)
+    #
+    # redeAdalineAnd.treinamento_online()
 
-    redeAdalineAnd.treinamento_online()
+    redeAdalineTrain.treinamento_online()
 
-    print(redeAdalineAnd.epoca)
+    redeAdalineTrain.conferirRespostas(redeAdalineTrain.x, redeAdalineTrain.w, redeAdalineTrain.w0, redeAdalineTrain.d, len(redeAdalineTrain.x))
 
     # redeAdalineTrain.treinamento_online()
     #
