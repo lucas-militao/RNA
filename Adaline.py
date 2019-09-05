@@ -6,7 +6,7 @@ from sklearn import preprocessing
 class Adaline:
 
     def __init__(self, entradas, saidasDesejadas, taxaAprendizagem, precisao_requerida):
-        # entradas = preprocessing.normalize(entradas) #dados normalizados
+        # self.normalization(entradas)
 
         self.x = entradas
         self.d = saidasDesejadas
@@ -15,7 +15,7 @@ class Adaline:
         self.w0 = []
         self.epoca = 0
         self.Eqm = []
-        self.Eqm_anterior = 0
+        self.Eqm_anterior = 100
         self.Eqm_atual = 0
         self.precisao = precisao_requerida
 
@@ -23,36 +23,38 @@ class Adaline:
     def treinamento_online(self):  # funcao que ira realizar o treinamento
         # self.varW = self.inicializarPesos(len(self.x[0]))
         # self.varW0 = self.inicializarLimiar()
-        self.w.append(self.inicializarPesos(len(self.x[0])))
-        self.w0 = self.inicializarLimiar()
+        # self.w.append(self.inicializarPesos(len(self.x[0])))
+        # self.w0.append(self.inicializarLimiar())
+        self.w = [[0,0]]
+        self.w0 = [0]
         self.varU = 0
         self.u = []
         self.atualizacao = 0
         y = 0  # variável que irá receber o sinal(u)
 
-        while self.Eqm_atual - self.Eqm_anterior <= self.precisao:
-            self.Eqm_anterior = self.calcEqm()
-            self.Eqm.append(self.Eqm_anterior)
+        while abs(self.Eqm_atual - self.Eqm_anterior) >= self.precisao:
+            self.Eqm_anterior = self.Eqm_atual
+            # self.Eqm.append(self.Eqm_anterior)
 
             for i in range(len(self.x)):
-                self.varU = self.calculoSaida(self.x[i], self.w[self.atualizacao])
+                self.varU = self.calculoSaida(self.x[i], self.w[self.atualizacao], self.w0[self.atualizacao])
                 self.u.append(self.varU)
-                self.w.append(self.atualizarPesos(self.w[self.atualizacao], self.n, (self.d[i] - self.varU), self.x[i]))
-                self.w0.append(self.atualizarLimiar(self.w0[self.atualizacao], self.n, (self.d[i] - self.varU)))
+                self.w.append(self.atualizarPesos(self.w[i], self.n, (self.d[i] - self.varU), self.x[i]))
+                self.w0.append(self.atualizarLimiar(self.w0[i], self.n, (self.d[i] - self.varU)))
 
-            self.Eqm_atual = self.calcEqm(len(self.x))
+            self.Eqm_atual = self.calcEqm(len(self.x), self.u, self.d)
             self.Eqm.append(self.Eqm_atual)
             self.epoca += 1
     # ----------------------------------------------------------------------
 
     # cálculo do Eqm
-    def calcEqm(self, p, u):
+    def calcEqm(self, p, u, d):
 
-        self.varU = 0
         self.resultado = 0
 
         for i in range(p):
-            self.resultado += u[i]
+            self.resultado += pow(d[i] - u[i], 2)
+        self.resultado = self.resultado/p
 
         return self.resultado
 
@@ -95,13 +97,27 @@ class Adaline:
         return random.random()
     # -----------------------------------------------
 
+    # inicializar pesos e limiar com dados nulos
+    def inicializarPesosNulos(self, n):
+        w = []
+
+        for i in range(n):
+            w.append(random.random())
+        return w
+
+    def inicializarLimiarNulos(self):
+        return random.random()
+    #------------------------------------------------
+
     def resultado(self):
         return self.w[len(self.w) - 1]
 
     def getW(self):
         w = [self.w0[len(self.w0) - 1],
              self.w[len(self.w) - 1][0],
-             self.w[len(self.w) - 1][1]]
+             self.w[len(self.w) - 1][1],
+             self.w[len(self.w) - 1][2],
+             self.w[len(self.w) - 1][3]]
         return w
 
     def normalization(self, x):
@@ -113,14 +129,17 @@ class Adaline:
         return x
 
 
-    def predict(self, entradas, valoresDesejado, w1, w2):
-        # normalizar = preprocessing.MinMaxScaler(feature_range=(-1, 1)).fit(entradas)
-        # entradas = normalizar.transform(entradas)
-        w0 = self.w0[len(self.w0)-1]
+    def predict(self, entradas, valoresDesejado, w):
+
+        w0 = w[0]
+        w1 = w[1]
+        w2 = w[2]
+        w3 = w[3]
+        w4 = w[4]
 
         for i in range(len(entradas)):
-            print('x1: {0}  x2: {1} D: {2}'.format(entradas[i][0], entradas[i][1], valoresDesejado[i]))
-            resultado = entradas[i][0]*w1 + entradas[i][1]*w2 - w0
+            print('x1: {0}  x2: {1} x3: {2}  x4: {3} D: {4}'.format(entradas[i][0], entradas[i][1], entradas[i][2], entradas[i][3], valoresDesejado[i]))
+            resultado = entradas[i][0]*w1 + entradas[i][1]*w2 + entradas[i][2]*w3 + entradas[i][3]*w4 - w0
             print('Resultado antes da operação: {0}'.format(resultado))
             if resultado >= 0:
                 resultado = 1
@@ -129,3 +148,5 @@ class Adaline:
 
             print('Iteração: {0} Resultado esperado: {1}  Resultado obtido: {2}'.format(i+1, valoresDesejado[i], resultado))
             print('-------------------------------------------------------------------------------------------------------')
+
+        print('Eqm ======= {0}'.format(self.Eqm))
